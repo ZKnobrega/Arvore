@@ -1,17 +1,18 @@
-#include <stdio.h>
+#include <iostream>
 #include <stdlib.h>
 
+using namespace std;
 struct NO{
     int info;
     int altura;
     struct NO *esq;
     struct NO *dir;
-};
+}NO;
 
 typedef struct NO* ArvBAL;
 
 ArvBAL* cria_ArvBAL(){
-    ArvBAL* raiz = (ArvBAL*) malloc(sizeof(ArvBAL));
+    ArvBAL* raiz = new ArvBAL;
     if(raiz != NULL)
         *raiz = NULL;
     return raiz;
@@ -40,7 +41,7 @@ int altura_NO(struct NO* no){
     return no->altura;
 }
 
-int fatorBalanceamento_NO(struct NO* no){
+int FatBalanc_NO(struct NO* no){
     return labs(altura_NO(no->esq) - altura_NO(no->dir));
 }
 
@@ -86,7 +87,7 @@ void preOrdem_ArvBAL(ArvBAL *raiz){
     if(raiz == NULL)
         return;
     if(*raiz != NULL){
-        printf("No %d\n",(*raiz)->info);
+        cout << "No\n" << (*raiz)->info;
         preOrdem_ArvBAL(&((*raiz)->esq));
         preOrdem_ArvBAL(&((*raiz)->dir));
     }
@@ -97,7 +98,7 @@ void emOrdem_ArvBAL(ArvBAL *raiz){
         return;
     if(*raiz != NULL){
         emOrdem_ArvBAL(&((*raiz)->esq));
-        printf("No %d\n",(*raiz)->info);
+        cout << "No\n" <<(*raiz)->info;
         emOrdem_ArvBAL(&((*raiz)->dir));
     }
 }
@@ -108,7 +109,7 @@ void posOrdem_ArvBAL(ArvBAL *raiz){
     if(*raiz != NULL){
         posOrdem_ArvBAL(&((*raiz)->esq));
         posOrdem_ArvBAL(&((*raiz)->dir));
-        printf("No %d\n",(*raiz)->info);
+        cout << "No\n" << (*raiz)->info;
     }
 }
 
@@ -129,7 +130,7 @@ int consulta_ArvBAL(ArvBAL *raiz, int valor){
 }
 
 void RotacaoLL(ArvBAL *A){
-    printf("RotacaoLL\n");
+    cout << "RotacaoLL\n";
     struct NO *B;
     B = (*A)->esq;
     (*A)->esq = B->dir;
@@ -140,7 +141,7 @@ void RotacaoLL(ArvBAL *A){
 }
 
 void RotacaoRR(ArvBAL *A){
-    printf("RotacaoRR\n");
+    cout << "RotacaoRR\n";
     struct NO *B;
     B = (*A)->dir;
     (*A)->dir = B->esq;
@@ -179,7 +180,7 @@ int insere_ArvBAL(ArvBAL *raiz, int valor){
     struct NO *atual = *raiz;
     if(valor < atual->info){
         if((res = insere_ArvBAL(&(atual->esq), valor)) == 1){
-            if(fatorBalanceamento_NO(atual) >= 2){
+            if(FatBalanc_NO(atual) >= 2){
                 if(valor < (*raiz)->esq->info ){
                     RotacaoLL(raiz);
                 }else{
@@ -190,7 +191,7 @@ int insere_ArvBAL(ArvBAL *raiz, int valor){
     }else{
         if(valor > atual->info){
             if((res = insere_ArvBAL(&(atual->dir), valor)) == 1){
-                if(fatorBalanceamento_NO(atual) >= 2){
+                if(FatBalanc_NO(atual) >= 2){
                     if((*raiz)->dir->info < valor){
                         RotacaoRR(raiz);
                     }else{
@@ -199,7 +200,7 @@ int insere_ArvBAL(ArvBAL *raiz, int valor){
                 }
             }
         }else{
-            printf("Valor duplicado!!\n");
+            cout << "Valor duplicado!!\n";
             return 0;
         }
     }
@@ -221,14 +222,14 @@ struct NO* procuraMenor(struct NO* atual){
 
 int remove_ArvBAL(ArvBAL *raiz, int valor){
 	if(*raiz == NULL){
-	    printf("valor não existe!!\n");
+	    cout << "valor não existe!!\n";
 	    return 0;
 	}
 
     int res;
 	if(valor < (*raiz)->info){
 	    if((res = remove_ArvBAL(&(*raiz)->esq,valor)) == 1){
-            if(fatorBalanceamento_NO(*raiz) >= 2){
+            if(FatBalanc_NO(*raiz) >= 2){
                 if(altura_NO((*raiz)->dir->esq) <= altura_NO((*raiz)->dir->dir))
                     RotacaoRR(raiz);
                 else
@@ -239,7 +240,7 @@ int remove_ArvBAL(ArvBAL *raiz, int valor){
 
 	if((*raiz)->info < valor){
 	    if((res = remove_ArvBAL(&(*raiz)->dir, valor)) == 1){
-            if(fatorBalanceamento_NO(*raiz) >= 2){
+            if(FatBalanc_NO(*raiz) >= 2){
                 if(altura_NO((*raiz)->esq->dir) <= altura_NO((*raiz)->esq->esq) )
                     RotacaoLL(raiz);
                 else
@@ -260,7 +261,7 @@ int remove_ArvBAL(ArvBAL *raiz, int valor){
 			struct NO* temp = procuraMenor((*raiz)->dir);
 			(*raiz)->info = temp->info;
 			remove_ArvBAL(&(*raiz)->dir, (*raiz)->info);
-            if(fatorBalanceamento_NO(*raiz) >= 2){
+            if(FatBalanc_NO(*raiz) >= 2){
 				if(altura_NO((*raiz)->esq->dir) <= altura_NO((*raiz)->esq->esq))
 					RotacaoLL(raiz);
 				else
@@ -278,27 +279,24 @@ int remove_ArvBAL(ArvBAL *raiz, int valor){
 }
 
 int main ()
-{   int opt,opt2,valor,inserir,remover,total,altura;
+{   int op,op2,valor,inserir,remover,total,altura;
     ArvBAL* raiz=cria_ArvBAL();
     do{
-    printf("0. Sair:\n");
-    printf("1. Listar arvore:\n");
-    printf("2. Inserir no na arvore:\n");
-    printf("3. Remover no da arvore:\n");
-    printf("4. Altura da arvore:\n");
-    printf("5. Quantidade de nos na arvore:\n");
-    printf("Opcao:");
-    scanf("%i",&opt);
-    switch(opt){
-        case(0):
-        break;
+    cout << "1 - Inserir no na arvore\n2 - Listar arvore\n3 - Remover no da arvore\n4 - Altura da arvore\n5 - Quantidade de nos na arvore\n6 - Sair:\n";
+    cout << "Opcao:";
+    cin >> op;
+    switch(op){
+
         case(1):
-                printf("listar arvore:\n");
-                printf("1. pre-ordem\n");
-                printf("2. em-ordem\n");
-                printf("3. pos-ordem\n");
-                scanf("%i",&opt2);
-                switch(opt2){
+            cout << "Insira um numero:\n";
+            cin >> valor;
+            inserir= insere_ArvBAL(raiz,valor);
+        break;
+
+        case(2):
+                cout << "listar arvore:\n1. pre-ordem\n2. em-ordem\n3. pos-ordem\n";
+                cin >> op2;
+                switch(op2){
                     case(1):
                         preOrdem_ArvBAL(raiz);
                     break;
@@ -310,28 +308,31 @@ int main ()
                     break;
                 }
         break;
-        case(2):
-            printf("entre com um numero:\n");
-            scanf("%i",&valor);
-            inserir= insere_ArvBAL(raiz,valor);
-        break;
+
+
         case(3):
-            printf("entre com um numero:\n");
-            scanf("%i",&valor);
+            cout << "entre com um numero:\n";
+            cin >> valor;
             remover= remove_ArvBAL(raiz,valor);
         break;
+
         case(4):
             altura= altura_ArvBAL(raiz);
-            printf("altura da arvore:%i \n",altura);
+            cout << "altura da arvore:%i \n" << altura << endl;
         break;
+
         case(5):
             total= totalNO_ArvBAL(raiz);
-            printf("total de Nos da arvore:%i \n",total);
+            cout << "total de Nos da arvore:%i \n" << total << endl;
         break;
+
         default:
-            printf("opicao invalida!\n");
+            cout << "opicao invalida!\n";
+        break;
+
+        case(6):
         break;
     }
-    }while(opt!=0);
+    }while(op!=6);
     return 0;
 }
